@@ -10,7 +10,6 @@ Currently, two official plugins are available:
 
 
 
-https://xiperafa.github.io/realControlDataBase 
+https://xiperafa.github.io/realControlDBCustomers 
 
-# realControlDataBase
-# realControlDBCustomerss
+# realControlDBCustomers

@@ -9,5 +9,5 @@ _plugins.unshift(MillionLint.vite())
 
 export default defineConfig({
   plugins: _plugins,
-  base: "https://xipeRafa.github.io/realControlDataBase"
+  base: "https://xipeRafa.github.io/realControlDBCustomers"
 })
