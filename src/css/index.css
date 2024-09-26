@@ -1,0 +1,81 @@
+
+
+
+
+
+
+body{
+  background-color: gainsboro!important;
+  user-select: none;
+}
+
+select {
+  margin-bottom: 10px!important;
+}
+
+input{
+  margin-bottom: 10px!important;
+}
+
+label{
+  color: gray!important;
+}
+
+textarea{
+    margin-bottom: 10px!important;
+}
+
+.red{
+  background-color: red!important;
+  border: none!important;
+}
+.blue{
+  background-color: blue!important;
+  border: none!important;
+}
+
+
+
+.gray{
+  background-color: white!important;
+  color: black!important;
+  border: none!important;
+}
+
+button:hover{
+  color: black!important;
+}
+
+.blue:hover{
+  color: white!important;
+}
+
+
+  input[type="date"] {
+    height: 38px;
+    padding: 6px 10px; /* The 6px vertically centers text on FF, ignored by Webkit */
+    background-color: #fff;
+    border: 1px solid #d1d1d1;
+    border-radius: 2px;
+/*    box-shadow: none;*/
+    box-sizing: border-box;
+    color: #555;
+    font-weight: 300;
+  }
+
+@media(max-width:1026px){
+
+  input[type="date"] {
+    width: 300px;
+  }
+}
+
+
+
+
+
+
+
+
+
+
