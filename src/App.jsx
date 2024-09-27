@@ -226,6 +226,8 @@ function App() {
       <Container>
         <Row>
         <Col>
+
+        <h1>Historial de Cientes</h1>
         <hr />
 
       <Form>
