@@ -118,9 +118,6 @@ function App() {
       if (confirm("Gaurdar Cliente")) {
 
 
-          if(editMode === false){
-              taskState.createdAt = Date.now()
-          }
 
           taskState.dataArr = [{servicioRealizado,tipoDeServicio,lastTime:Date.now(),comentarios,fechaMeta}]
 
@@ -149,33 +146,59 @@ function App() {
 
   const [updateMode, setUpdateMode]=useState(false)
 
+  const [newObj, setNewObj]=useState({
+    comentarios:"",
+    fechaMeta:"",
+    servicioRealizado:"",
+    tipoDeServicio:""
+  })
+
+
+
+  const handlerUpdateMode=({target})=>{
+      const {name, value} = target
+      setNewObj({...newObj, [name]:value})
+  }
+
+  const [saveObj, setSaveObj]=useState()
+  const [saveID, setSaveID]=useState()
+
+ 
 
 
   const updateById = async (id, obj) => {
+
+
+      setSaveObj(obj)
+      setSaveID(id)
 
       if(updateMode === false){
           setUpdateMode(true)
           return
       }
 
+      newObj.lastTime = Date.now()
 
-      console.log('siiii')
 
-      // if (confirm("Añadir nueva info a Cliente")) {
+      saveObj.dataArr.push(newObj)
 
-      //     delete obj.id
 
-      //     const aDoc = doc(firestoreDB, 'RealControlCustomers', id)
+      if (confirm("Añadir nueva info a Cliente")) {
 
-      //     try {
-      //         await updateDoc(aDoc, obj);
-      //     } catch (error) {
-      //         console.error(error);
-      //     }
+          delete saveObj.id
 
-      //     setToggle(!toggle)
+          const aDoc = doc(firestoreDB, 'RealControlCustomers', saveID)
 
-      // }
+          try {
+              await updateDoc(aDoc, saveObj);
+          } catch (error) {
+              console.error(error);
+          }
+
+          setUpdateMode(false)
+          setToggle(!toggle)
+
+      }
 
   }
 
@@ -188,6 +211,13 @@ function App() {
             setClienteNameFinder(e.target.value)
         }
     }
+
+
+
+    const [show, setShow] = useState(false);
+
+    const handleClose = () => setShow(false);
+    const handleShow = () => setShow(true);
 
 
   return (
@@ -235,7 +265,7 @@ function App() {
         </Form.Group>
 
         <Form.Label>Comentarios</Form.Label>
-        <Form.Control as="textarea"  name='comentarios' value={comentarios} onChange={(e)=>handlerTaskState(e)} />
+        <Form.Control as="textarea" name='comentarios' value={comentarios} onChange={(e)=>handlerTaskState(e)} />
       </Form>
 
       <Button variant="primary" onClick={guardar}>
@@ -266,28 +296,19 @@ function App() {
 
                     <p>Cliente: {el.nombreCliente}</p>
                     <p>Direccion: {el.direccionCliente}</p>
-                    <p>Cliente Creado el: {msecToDateNumbers(el.createdAt)}</p>
 
                     {el.dataArr.map((el, i)=>(
                         <div key={i}>
-                            <p className={!updateMode ? '': 'd-none'}>Servicio:{el.servicioRealizado}</p>
-                            <Form.Control className={updateMode ? '': 'd-none'} placeholder='Servicio Realizado' type="text" />
-
-                            <p className={!updateMode ? '': 'd-none'}>Hora:{el.fechaMeta}</p>
-                            <Form.Control className={updateMode ? '': 'd-none'} placeholder='Fecha y Hora' type="text" />
-
-                            <p className={!updateMode ? '': 'd-none'}>Tipo:{el.tipoDeServicio}</p>
-                            <Form.Control className={updateMode ? '': 'd-none'} placeholder='Tipo de Servicio' type="text" />
-
-                            <p className={!updateMode ? '': 'd-none'}>Comentarios:{el.comentarios}</p>
-                            <Form.Control className={updateMode ? '': 'd-none'} placeholder='Comentarios' type="text" />
-
-                            <p>Ultima Actualización:{msecToDateNumbers(el?.lastTime)}</p>
+                            <p>Servicio:{el.servicioRealizado}</p>
+                            <p>Hora:{el.fechaMeta}</p>
+                            <p>Tipo:{el.tipoDeServicio}</p>
+                            <p>Comentarios:{el.comentarios}</p>
+                            <p>Ultima Actualización: {msecToDateNumbers(el?.lastTime)}</p>
                             <hr />
                         </div>
                     ))}
 
-                    <Button disabled={el.completed} variant="info" onClick={()=>updateById(el.id, el)}>
+                    <Button disabled={el.completed} variant="info" onClick={()=>{updateById(el.id, el), handleShow()}}>
                         {!updateMode ? 'Actualizar' : 'Guardar Nueva Info'}
                     </Button>
 
@@ -301,6 +322,26 @@ function App() {
       </Container>
 
 
+
+      <Modal show={show} onHide={handleClose}>
+
+        <Modal.Header closeButton>
+          <Modal.Title>Guardar Ultimo Servicio</Modal.Title>
+        </Modal.Header>
+
+        <Modal.Body>
+            <Form.Control placeholder='Servicio Realizado' name='servicioRealizado' onChange={(e)=>handlerUpdateMode(e)}/>
+            <Form.Control placeholder='Fecha y Hora' name='fechaMeta' onChange={(e)=>handlerUpdateMode(e)}/>
+            <Form.Control placeholder='Tipo de Servicio' name='tipoDeServicio' onChange={(e)=>handlerUpdateMode(e)}/>
+            <Form.Control placeholder='Comentarios' name='comentarios' onChange={(e)=>handlerUpdateMode(e)}/>
+        </Modal.Body>
+
+        <Modal.Footer>
+          <Button variant="info" onClick={()=>{updateById(), handleClose()}}>
+              Guardar Nueva Info
+          </Button>
+        </Modal.Footer>
+      </Modal>
 
 
     </>
