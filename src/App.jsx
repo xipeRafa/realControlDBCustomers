@@ -36,15 +36,11 @@ import Col from 'react-bootstrap/Col';
 
 function App() {
 
-  const [DateMS, setDateMS]=useState('')
-
 
   const [items, setItems] = useState([]);
-  const [tecnicoState, setTecnicoState]=useState('')
 
   const itemCollection = query(
-      collection(firestoreDB, 'tasksRealControl'),
-      where('asignadoPara', '==', tecnicoState)
+      collection(firestoreDB, 'RealControlCustomers'),
   )
 
   const [toggle, setToggle] = useState(true)
@@ -70,85 +66,229 @@ function App() {
   }, [toggle])
 
 
-  useEffect(()=>{
-      setToggle(!toggle)
-  },[tecnicoState])
 
 
 
-  // const updateById = async (id, obj) => {
 
-  //   if (confirm("Marcar como Servicio Completado")) {
-  //     obj.completed = true
-  //     obj.completedTime = Date.now()
-  //     delete obj.id
 
-  //     const aDoc = doc(firestoreDB, 'tasksRealControl', id)
 
-  //     try {
-  //         await updateDoc(aDoc, obj);
-  //     } catch (error) {
-  //         console.error(error);
-  //     }
 
-  //     setToggle(!toggle)
-  //   }
+  const[taskState, setTaskState]=useState({
+    comentarios:"",
+    direccionCliente:"",
+    fechaMeta:"",
+    nombreCliente:"",
+    servicioRealizado:"",
+    tipoDeServicio:""
+  })
 
-  // }
 
-    const handlerUsuario=(USER)=>{
-        if(DateMS === ''){
-          alert('Selecciona una Fecha y despues un Usuario')
+  const {
+    comentarios,
+    direccionCliente,
+    fechaMeta,
+    nombreCliente,
+    servicioRealizado,
+    tipoDeServicio
+  } = taskState
+
+
+  const handlerTaskState=({target})=>{
+      const {name, value} = target
+      setTaskState({...taskState, [name]:value})
+  }
+
+
+
+  const postCollection = collection(firestoreDB, 'RealControlCustomers');
+
+  const guardar =()=>{
+
+      if (comentarios.trim() === '' ||
+          direccionCliente.trim() === '' ||
+          fechaMeta.trim() === '' ||
+          nombreCliente.trim() === '' ||
+          servicioRealizado.trim() === '' ||
+          tipoDeServicio.trim() === '' ){
+              alert('Algun Campo esta Vacio')
+              return
+          }
+
+
+      if (confirm("Gaurdar Cliente")) {
+
+
+          if(editMode === false){
+              taskState.createdAt = Date.now()
+          }
+
+          taskState.dataArr = [{servicioRealizado,tipoDeServicio,lastTime:Date.now(),comentarios,fechaMeta}]
+
+          delete taskState.servicioRealizado
+          delete taskState.tipoDeServicio
+          delete taskState.comentarios
+          delete taskState.fechaMeta
+
+          addDoc(postCollection, taskState)
+          setTaskState({
+              comentarios:"",
+              direccionCliente:"",
+              fechaMeta:"",
+              nombreCliente:"",
+              servicioRealizado:"",
+              tipoDeServicio:""
+          })
+      }
+
+  }
+
+
+
+
+
+
+  const [updateMode, setUpdateMode]=useState(false)
+
+
+
+  const updateById = async (id, obj) => {
+
+      if(updateMode === false){
+          setUpdateMode(true)
           return
+      }
+
+
+      console.log('siiii')
+
+      // if (confirm("Añadir nueva info a Cliente")) {
+
+      //     delete obj.id
+
+      //     const aDoc = doc(firestoreDB, 'RealControlCustomers', id)
+
+      //     try {
+      //         await updateDoc(aDoc, obj);
+      //     } catch (error) {
+      //         console.error(error);
+      //     }
+
+      //     setToggle(!toggle)
+
+      // }
+
+  }
+
+
+
+    const [clienteNameFinder, setClienteNameFinder]=useState()
+
+    const handlerFinder =(e)=>{
+        if(e.target.value.length > 3){
+            setClienteNameFinder(e.target.value)
         }
-        setTecnicoState(USER)
-    }
-
-
-
-  
-    const setDate=(e)=>{
-        let DateToCero = Date.parse(e.target.value.replace('-', '/').replace('-', '/'))
-        setDateMS(DateToCero)
     }
 
 
   return (
     <>
 
+      <Container>
+        <Row>
+        <Col>
+        <hr />
 
+      <Form>
+        <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
+            <Form.Label>Nombre de Cliente</Form.Label>
+            <Form.Control type="text" name='nombreCliente' value={nombreCliente} onChange={(e)=>handlerTaskState(e)} />
+
+            <Form.Label>Direccion de Cliente</Form.Label>
+            <Form.Control type="text" name='direccionCliente' value={direccionCliente} onChange={(e)=>handlerTaskState(e)}/>
+
+            <Form.Label>Servicio Realizado</Form.Label>
+            <Form.Control as="textarea" name='servicioRealizado' value={servicioRealizado} onChange={(e)=>handlerTaskState(e)}/>
+
+            <Form.Label>Fecha y Hora de Atencion</Form.Label>
+            <Form.Control type="text" name='fechaMeta' value={fechaMeta} onChange={(e)=>handlerTaskState(e)}/>
+
+            <Form.Label>Tipo de Servicio</Form.Label>
+            <Form.Select value={tipoDeServicio} name='tipoDeServicio' onChange={(e)=>handlerTaskState(e)}>
+
+              <option></option>
+              <option value="domestica chica">Domestica Chica</option>
+              <option value="comercial chica">Comercial Chica</option>
+              <option value="industrial chica">Industrial Chica</option>
+
+              <hr />
+
+              <option value="domestica mediana">Domestica Mediana</option>
+              <option value="comercial mediana">Comercial Mediana</option>
+              <option value="industrial mediana">Industrial Mediana</option>
+
+              <hr />
+
+              <option value="domestica grande">Domestica Grande</option>
+              <option value="comercial grande">Comercial Grande</option>
+              <option value="industrial grande">Industrial Grande</option>
+            </Form.Select>
+        </Form.Group>
+
+        <Form.Label>Comentarios</Form.Label>
+        <Form.Control as="textarea"  name='comentarios' value={comentarios} onChange={(e)=>handlerTaskState(e)} />
+      </Form>
+
+      <Button variant="primary" onClick={guardar}>
+          GUARDAR
+      </Button>
+
+
+
+        </Col>
+        </Row>
+      </Container>
+
+  
 
       <Container>
-      <hr />
-
-        <Row className='d-flex text-center'>
-            <Col><input type='date'  onChange={(e)=>setDate(e)}/> </Col>
-            <Col><Button className={tecnicoState !== 'usuario1' ? 'gray' : 'blue' } onClick={()=>handlerUsuario('usuario1')}>Usuario1</Button> </Col>
-            <Col><Button className={tecnicoState !== 'usuario2' ? 'gray' : 'blue' } onClick={()=>handlerUsuario('usuario2')}>Usuario2</Button> </Col>
-            <Col><Button className={tecnicoState !== 'usuario3' ? 'gray' : 'blue' } onClick={()=>handlerUsuario('usuario3')}>Usuario3</Button> </Col>
-        </Row>
-
         <Row>
           <Col>
 
-              {/*{tecnicoState}*/}
-              {items?.sort((a, b) => b.createdAt - a.createdAt)
-                    .filter(el=>el.createdAt > DateMS)
-                    .filter(el=>el.createdAt < DateMS + 86400000).map((el, i)=>(
+          <hr />
+
+           <Form.Label>Buscar por Nombre de Cliente</Form.Label>
+            <Form.Control type="search" name='nombreClienteFinder'  onChange={(e)=>handlerFinder(e)} />
+
+              {items?.filter((el) => el.nombreCliente.indexOf(clienteNameFinder) > -1).map((el, i)=>(
                   <div key={i}>
 
                     <hr />
+
                     <p>Cliente: {el.nombreCliente}</p>
                     <p>Direccion: {el.direccionCliente}</p>
-                    <p>Servicio: {el.servicioDescripcion}</p>
-                    <p>Hora: {el.fechaMeta}</p>
-                    <p>Tipo: {el.tipoDeServicio}</p>
-                    <p>Consumibles: {el.consumibles}</p>
-                    <p>Comentarios: {el.comentarios}</p>
-                    <p>Tarea Creada el: {msecToDateNumbers(el.createdAt)}</p>
+                    <p>Cliente Creado el: {msecToDateNumbers(el.createdAt)}</p>
 
-                    <Button disabled={true} variant="primary" className={el.completed ? '' : 'red'}>
-                        {el.completed ? 'Completado' : 'Pendiente'}
+                    {el.dataArr.map((el, i)=>(
+                        <div key={i}>
+                            <p className={!updateMode ? '': 'd-none'}>Servicio:{el.servicioRealizado}</p>
+                            <Form.Control className={updateMode ? '': 'd-none'} placeholder='Servicio Realizado' type="text" />
+
+                            <p className={!updateMode ? '': 'd-none'}>Hora:{el.fechaMeta}</p>
+                            <Form.Control className={updateMode ? '': 'd-none'} placeholder='Fecha y Hora' type="text" />
+
+                            <p className={!updateMode ? '': 'd-none'}>Tipo:{el.tipoDeServicio}</p>
+                            <Form.Control className={updateMode ? '': 'd-none'} placeholder='Tipo de Servicio' type="text" />
+
+                            <p className={!updateMode ? '': 'd-none'}>Comentarios:{el.comentarios}</p>
+                            <Form.Control className={updateMode ? '': 'd-none'} placeholder='Comentarios' type="text" />
+
+                            <p>Ultima Actualización:{msecToDateNumbers(el?.lastTime)}</p>
+                            <hr />
+                        </div>
+                    ))}
+
+                    <Button disabled={el.completed} variant="info" onClick={()=>updateById(el.id, el)}>
+                        {!updateMode ? 'Actualizar' : 'Guardar Nueva Info'}
                     </Button>
 
                     <p className={!el?.completedTime ? 'd-none' : 'warning'}>Completado el: {msecToDateNumbers(el?.completedTime)}</p>
@@ -158,7 +298,6 @@ function App() {
                 ))}
           </Col>
         </Row>
-
       </Container>
 
 
