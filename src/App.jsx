@@ -229,7 +229,11 @@ function App() {
 
     const [show, setShow] = useState(false);
 
-    const handleClose = () => setShow(false);
+    const handleClose = () => {
+      setUpdateMode(false)
+      setShow(false)
+    }
+
     const handleShow = () => setShow(true);
 
 
@@ -242,7 +246,6 @@ function App() {
 
         <h1>Historial de Cientes</h1>
         <hr />
-
       <Form>
         <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
             <Form.Label>Nombre de Cliente</Form.Label>
@@ -332,7 +335,7 @@ function App() {
                     ))}
 
                     <Button disabled={el.completed} variant="info" onClick={()=>{updateById(el.id, el), handleShow()}}>
-                        Actualizar
+                        Actualizar {el.nombreCliente}
                     </Button>
 
                     <p className={!el?.completedTime ? 'd-none' : 'warning'}>Completado el: {msecToDateNumbers(el?.completedTime)}</p>
