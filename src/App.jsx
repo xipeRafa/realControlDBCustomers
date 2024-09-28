@@ -76,20 +76,24 @@ function App() {
   const[taskState, setTaskState]=useState({
     comentarios:"",
     direccionCliente:"",
+    correoCliente:"",
     fechaMeta:"",
     nombreCliente:"",
     servicioRealizado:"",
-    tipoDeServicio:""
+    tipoDeServicio:"",
+    telefonoCliente:""
   })
 
 
   const {
     comentarios,
     direccionCliente,
+    correoCliente,
     fechaMeta,
     nombreCliente,
     servicioRealizado,
-    tipoDeServicio
+    tipoDeServicio,
+    telefonoCliente
   } = taskState
 
 
@@ -106,6 +110,8 @@ function App() {
 
       if (comentarios.trim() === '' ||
           direccionCliente.trim() === '' ||
+          telefonoCliente.trim() === '' ||
+          correoCliente.trim() === '' ||
           fechaMeta.trim() === '' ||
           nombreCliente.trim() === '' ||
           servicioRealizado.trim() === '' ||
@@ -130,11 +136,18 @@ function App() {
           setTaskState({
               comentarios:"",
               direccionCliente:"",
+              telefonoCliente:"",
+              correoCliente:"",
               fechaMeta:"",
               nombreCliente:"",
               servicioRealizado:"",
               tipoDeServicio:""
           })
+
+          setTimeout(()=>{
+            window.location.reload()
+          },600)
+          
       }
 
   }
@@ -238,6 +251,12 @@ function App() {
             <Form.Label>Direccion de Cliente</Form.Label>
             <Form.Control type="text" name='direccionCliente' value={direccionCliente} onChange={(e)=>handlerTaskState(e)}/>
 
+            <Form.Label>Telefono de Cliente</Form.Label>
+            <Form.Control type="text" name='telefonoCliente' value={telefonoCliente} onChange={(e)=>handlerTaskState(e)}/>
+
+            <Form.Label>Correo de Cliente</Form.Label>
+            <Form.Control type="mail" name='correoCliente' value={correoCliente} placeholder='@' onChange={(e)=>handlerTaskState(e)}/>
+
             <Form.Label>Servicio Realizado</Form.Label>
             <Form.Control as="textarea" name='servicioRealizado' value={servicioRealizado} onChange={(e)=>handlerTaskState(e)}/>
 
@@ -298,7 +317,9 @@ function App() {
 
                     <p>Cliente: {el.nombreCliente}</p>
                     <p>Direccion: {el.direccionCliente}</p>
-
+                    <p>Telefono: {el.telefonoCliente}</p>
+                    <p>Correo: {el.correoCliente}</p>
+                    <hr />
                     {el.dataArr.map((el, i)=>(
                         <div key={i}>
                             <p>Servicio:{el.servicioRealizado}</p>
@@ -311,7 +332,7 @@ function App() {
                     ))}
 
                     <Button disabled={el.completed} variant="info" onClick={()=>{updateById(el.id, el), handleShow()}}>
-                        {!updateMode ? 'Actualizar' : 'Guardar Nueva Info'}
+                        Actualizar
                     </Button>
 
                     <p className={!el?.completedTime ? 'd-none' : 'warning'}>Completado el: {msecToDateNumbers(el?.completedTime)}</p>
@@ -334,7 +355,29 @@ function App() {
         <Modal.Body>
             <Form.Control placeholder='Servicio Realizado' name='servicioRealizado' onChange={(e)=>handlerUpdateMode(e)}/>
             <Form.Control placeholder='Fecha y Hora' name='fechaMeta' onChange={(e)=>handlerUpdateMode(e)}/>
-            <Form.Control placeholder='Tipo de Servicio' name='tipoDeServicio' onChange={(e)=>handlerUpdateMode(e)}/>
+
+            <Form.Label>Tipo de Servicio</Form.Label>
+            <Form.Select name='tipoDeServicio' onChange={(e)=>handlerUpdateMode(e)}>
+
+              <option></option>
+              <option value="domestica chica">Domestica Chica</option>
+              <option value="comercial chica">Comercial Chica</option>
+              <option value="industrial chica">Industrial Chica</option>
+
+              <hr />
+
+              <option value="domestica mediana">Domestica Mediana</option>
+              <option value="comercial mediana">Comercial Mediana</option>
+              <option value="industrial mediana">Industrial Mediana</option>
+
+              <hr />
+
+              <option value="domestica grande">Domestica Grande</option>
+              <option value="comercial grande">Comercial Grande</option>
+              <option value="industrial grande">Industrial Grande</option>
+            </Form.Select>
+
+
             <Form.Control placeholder='Comentarios' name='comentarios' onChange={(e)=>handlerUpdateMode(e)}/>
         </Modal.Body>
 
