@@ -24,8 +24,24 @@ import Col from 'react-bootstrap/Col';
 
 
 
- const msecToDateNumbers =(milliseconds)=>{ // '16/8/2024, 12:00:00 a.m.'
+  const msecToDateNumbers =(milliseconds)=>{ // '16/8/2024, 12:00:00 a.m.'
       return new Date(milliseconds).toLocaleString()
+  }
+
+  const msecToDate =(milliseconds)=> {   // 'viernes, 16 de agosto de 2024, 13:36:10'
+
+     const options = {
+          weekday: "long", // narrow, short
+          year: "numeric", // 2-digit
+          month: "long", // numeric, 2-digit, narrow, long
+          day: "numeric", // 2-digit
+          // hour:'numeric',
+          // minute:'numeric',
+          // second:'numeric'
+      }
+
+      return new Date(milliseconds).toLocaleString('es-ES', options)
+
   }
 
 
@@ -37,149 +53,147 @@ import Col from 'react-bootstrap/Col';
 function App() {
 
 
-  const [items, setItems] = useState([]);
+    const [items, setItems] = useState([]);
 
-  const itemCollection = query(
-      collection(firestoreDB, 'RealControlCustomers'),
-  )
+    const itemCollection = query(
+        collection(firestoreDB, 'RealControlCustomers'),
+    )
 
-  const [toggle, setToggle] = useState(true)
-
-  useEffect(() => {
-
-      getDocs(itemCollection).then((resp) => {
-
-          if (resp.size === 0) {
-              console.log('No results!');
-          }
-
-          const documents = resp.docs.map((doc) => (
-              { id: doc.id, ...doc.data() }
-          ))
-
-          setItems(documents);
-
-      }).catch((err) => {
-          console.log('Error searching items', err)
-      })
-
-  }, [toggle])
+    const [toggle, setToggle] = useState(true)
 
 
 
 
+    useEffect(() => {
+
+        getDocs(itemCollection).then((resp) => {
+
+            if (resp.size === 0) {
+                console.log('No results!');
+            }
+
+            const documents = resp.docs.map((doc) => (
+                { id: doc.id, ...doc.data() }
+            ))
+
+            setItems(documents);
+
+        }).catch((err) => {
+            console.log('Error searching items', err)
+        })
+
+    }, [toggle])
 
 
 
 
 
-  const[taskState, setTaskState]=useState({
-    comentarios:"",
-    direccionCliente:"",
-    correoCliente:"",
-    fechaMeta:"",
-    nombreCliente:"",
-    servicioRealizado:"",
-    tipoDeServicio:"",
-    telefonoCliente:""
-  })
+    const[taskState, setTaskState]=useState({
+        comentarios:"",
+        direccionCliente:"",
+        correoCliente:"",
+        fechaMeta:"",
+        nombreCliente:"",
+        servicioRealizado:"",
+        tipoDeServicio:"",
+        telefonoCliente:""
+    })
 
 
-  const {
-    comentarios,
-    direccionCliente,
-    correoCliente,
-    fechaMeta,
-    nombreCliente,
-    servicioRealizado,
-    tipoDeServicio,
-    telefonoCliente
-  } = taskState
+    const {
+        comentarios,
+        direccionCliente,
+        correoCliente,
+        fechaMeta,
+        nombreCliente,
+        servicioRealizado,
+        tipoDeServicio,
+        telefonoCliente
+    } = taskState
 
 
-  const handlerTaskState=({target})=>{
-      const {name, value} = target
-      setTaskState({...taskState, [name]:value})
-  }
+    const handlerTaskState=({target})=>{
+        const {name, value} = target
+        setTaskState({...taskState, [name]:value})
+    }
 
 
-
-  const postCollection = collection(firestoreDB, 'RealControlCustomers');
-
-  const guardar =()=>{
-
-      if (comentarios.trim() === '' ||
-          direccionCliente.trim() === '' ||
-          telefonoCliente.trim() === '' ||
-          correoCliente.trim() === '' ||
-          fechaMeta.trim() === '' ||
-          nombreCliente.trim() === '' ||
-          servicioRealizado.trim() === '' ||
-          tipoDeServicio.trim() === '' ){
-              alert('Algun Campo esta Vacio')
-              return
-          }
+    const postCollection = collection(firestoreDB, 'RealControlCustomers');
 
 
-      if (confirm("Gaurdar Cliente")) {
+    const guardar =()=>{
+
+        if (comentarios.trim() === '' ||
+            direccionCliente.trim() === '' ||
+            telefonoCliente.trim() === '' ||
+            correoCliente.trim() === '' ||
+            fechaMeta.trim() === '' ||
+            nombreCliente.trim() === '' ||
+            servicioRealizado.trim() === '' ||
+            tipoDeServicio.trim() === '' ){
+                alert('Algun Campo esta Vacio')
+                return
+            }
 
 
+        if (confirm("Gaurdar Cliente")) {
 
-          taskState.dataArr = [{servicioRealizado,tipoDeServicio,lastTime:Date.now(),comentarios,fechaMeta}]
+            taskState.dataArr = [{servicioRealizado,tipoDeServicio,lastTime:Date.now(),comentarios,fechaMeta}]
 
-          delete taskState.servicioRealizado
-          delete taskState.tipoDeServicio
-          delete taskState.comentarios
-          delete taskState.fechaMeta
+            delete taskState.servicioRealizado
+            delete taskState.tipoDeServicio
+            delete taskState.comentarios
+            delete taskState.fechaMeta
 
-          addDoc(postCollection, taskState)
-          setTaskState({
-              comentarios:"",
-              direccionCliente:"",
-              telefonoCliente:"",
-              correoCliente:"",
-              fechaMeta:"",
-              nombreCliente:"",
-              servicioRealizado:"",
-              tipoDeServicio:""
-          })
+            addDoc(postCollection, taskState)
 
-          setTimeout(()=>{
-            window.location.reload()
-          },600)
+            setTaskState({
+                comentarios:"",
+                direccionCliente:"",
+                telefonoCliente:"",
+                correoCliente:"",
+                fechaMeta:"",
+                nombreCliente:"",
+                servicioRealizado:"",
+                tipoDeServicio:""
+            })
+
+            setTimeout(()=>{
+                window.location.reload()
+            },600)
           
-      }
+        }
 
-  }
-
-
+    }
 
 
 
 
-  const [updateMode, setUpdateMode]=useState(false)
-
-  const [newObj, setNewObj]=useState({
-    comentarios:"",
-    fechaMeta:"",
-    servicioRealizado:"",
-    tipoDeServicio:""
-  })
 
 
+    const [updateMode, setUpdateMode]=useState(false)
 
-  const handlerUpdateMode=({target})=>{
-      const {name, value} = target
-      setNewObj({...newObj, [name]:value})
-  }
+    const [newObj, setNewObj]=useState({
+        comentarios:"",
+        fechaMeta:"",
+        servicioRealizado:"",
+        tipoDeServicio:""
+    })
 
-  const [saveObj, setSaveObj]=useState()
-  const [saveID, setSaveID]=useState()
+
+
+    const handlerUpdateMode=({target})=>{
+        const {name, value} = target
+        setNewObj({...newObj, [name]:value})
+    }
+
+    const [saveObj, setSaveObj]=useState()
+    const [saveID, setSaveID]=useState()
 
  
 
 
-  const updateById = async (id, obj) => {
+    const updateById = async (id, obj) => {
 
 
       setSaveObj(obj)
@@ -213,7 +227,9 @@ function App() {
 
       }
 
-  }
+    }
+
+
 
 
 
@@ -236,6 +252,44 @@ function App() {
 
     const handleShow = () => setShow(true);
 
+
+    const [servicioBoolState, setServicioBoolState]=useState(false)
+
+    const handlerProximoServicio =()=>{
+        setServicioBoolState(!servicioBoolState)    
+    }
+
+    const [oneMontState, setOneMonthState]=useState(86400000*30)
+    const [sixMontState, setSixMonthState]=useState(86400000*180)
+
+    const [montsState, setMontState]=useState(false)
+
+
+    const[proximoServicioState, setProximoServicioState]=useState()
+
+
+    const updateByIdLastService = async (id, objeto) => {
+
+
+      objeto.proximoServicio = proximoServicioState
+
+
+      if (confirm( `Proximo Servicio Sera: ${msecToDate(proximoServicioState)}` )) {
+
+          delete objeto.id
+
+          const aDoc = doc(firestoreDB, 'RealControlCustomers', id)
+
+          try {
+              await updateDoc(aDoc, objeto);
+          } catch (error) {
+              console.error(error);
+          }
+          setServicioBoolState(!servicioBoolState) 
+
+      }
+
+    }
 
   return (
     <>
@@ -319,6 +373,7 @@ function App() {
                     <hr />
 
                     <p>Cliente: {el.nombreCliente}</p>
+                    <p>Proximo Servicio: { msecToDate(el.proximoServicio)}</p>
                     <p>Direccion: {el.direccionCliente}</p>
                     <p>Telefono: {el.telefonoCliente}</p>
                     <p>Correo: {el.correoCliente}</p>
@@ -334,15 +389,42 @@ function App() {
                         </div>
                     ))}
 
+                    <p className='btn btn-outline-primary' onClick={()=>{handlerProximoServicio()
+                                      setProximoServicioState(el.dataArr.slice(-1)[0].lastTime + (!montsState ? oneMontState : sixMontState ))
+                                    } 
+                    }>
+                         {msecToDate(proximoServicioState)}
+                    </p>
+
+                    <br />
+
+                    <span className={!servicioBoolState ? 'd-none' : ''}>{montsState ? 'En 6 Meses' : 'En 1 Mes'}</span>
+
+                    <div className={!servicioBoolState ? 'd-none' : ''}>
+                        <Button className='m-1' onClick={()=>{setMontState(true),setProximoServicioState(el.dataArr.slice(-1)[0].lastTime + (montsState ? oneMontState : sixMontState))}}>6 Meses</Button>
+                        <Button className='m-1' onClick={()=>{setMontState(false),setProximoServicioState(el.dataArr.slice(-1)[0].lastTime + (montsState ? oneMontState : sixMontState))}}>1 Mes</Button>
+
+                        <span>{montsState ? '6 Meses' : '1 Mes'}</span>
+
+                        <Button className='m-1' onClick={()=>setProximoServicioState(proximoServicioState-86400000)}>←</Button>
+                        <Button className='m-1' onClick={()=>setProximoServicioState(proximoServicioState+86400000)}>→</Button>
+
+                        <Button className='m-1' variant="info" onClick={()=>{updateByIdLastService(el.id, el)}}>Guardar</Button>
+
+                        <hr />
+                    </div>
+
                     <Button disabled={el.completed} variant="info" onClick={()=>{updateById(el.id, el), handleShow()}}>
                         Actualizar {el.nombreCliente}
                     </Button>
 
-                    <p className={!el?.completedTime ? 'd-none' : 'warning'}>Completado el: {msecToDateNumbers(el?.completedTime)}</p>
+                    {/*<p className={!el?.completedTime ? 'd-none' : 'warning'}>Completado el: {msecToDateNumbers(el?.completedTime)}</p>*/}
 
                     <hr />
                   </div>
                 ))}
+
+
           </Col>
         </Row>
       </Container>
