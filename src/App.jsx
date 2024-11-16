@@ -298,7 +298,7 @@ function App() {
         <Row>
         <Col>
 
-        <h1>Historial de Clientes, Buscador, y Nuevos Servicios</h1>
+        <h1>Historial de Clientes, Buscador y Nuevos Servicios</h1>
         <hr />
       <Form>
         <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
